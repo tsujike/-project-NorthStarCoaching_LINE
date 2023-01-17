@@ -31,19 +31,19 @@ const messageObjectEnum = {
           {
             "type": "postback",
             "label": "会社役員",
-            "data": "[Follow_Form1]会社役員", //.postback.dataで文字列を返す
+            "data": "[follow_Form1]会社役員", //.postback.dataで文字列を返す
             "displayText": "会社役員"
           },
           {
             "type": "postback",
             "label": "会社員",
-            "data": "[Follow_Form2]会社員", //.postback.dataで文字列を返す
+            "data": "[follow_Form1]会社員", //.postback.dataで文字列を返す
             "displayText": "会社員"
           },
           {
             "type": "postback",
             "label": "自営業・フリーランス",
-            "data": "[Follow_Form3]自営業・フリーランス", //.postback.dataで文字列を返す
+            "data": "[follow_Form1]自営業・フリーランス", //.postback.dataで文字列を返す
             "displayText": "自営業・フリーランス"
           },
           {
@@ -68,13 +68,13 @@ const messageObjectEnum = {
           {
             "type": "postback",
             "label": "男性",
-            "data": "[Follow_Form2]男性",
+            "data": "[follow_Form2]男性",
             "displayText": "男性"
           },
           {
             "type": "postback",
             "label": "女性",
-            "data": "[Follow_Form2]女性",
+            "data": "[follow_Form2]女性",
             "displayText": "女性"
           },
           {

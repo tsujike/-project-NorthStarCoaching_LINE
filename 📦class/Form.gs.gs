@@ -13,7 +13,7 @@ class Form {
     this.mode = event.mode;
     this.scenario = event.postback.data.match(/\[.*?_/)[0].replace("[", "").replace("_", ""); //followなど
     this.formZone = event.postback.data.match(/Form\d+|終了/)[0]; //form1など
-    this.messageObject = FORM_ENUM[this.fomZone];
+    this.messageObject = FORM_ENUM[`${this.scenario}${this.formZone}`];
   }
 
   /** 個別メッセージを送信するメソッド */

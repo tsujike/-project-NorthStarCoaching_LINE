@@ -182,13 +182,19 @@ function recievePostback(event) {
     f.sendForm();
 
     // スプレッドシートに貼り付ける
-    const record = f.getArray();
+    const record = f.createArray();
 
     const SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
     const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName("Data");
     sheet.appendRow(record);
 
   } catch (e) {
+    GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", event.postback.data);
+
+    GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", event.event.postback.data.match(/\[.*?_/)[0].replace("[", "").replace("_", ""));
+
+    GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", event.postback.data.match(/Form\d+|終了/)[0]);
+
     GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", e.message);
   }
 
