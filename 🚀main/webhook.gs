@@ -178,9 +178,6 @@ function recievePostback(event) {
     //インスタンス生成
     const f = new Form(event);
 
-    //フォームを送信する
-    f.sendForm();
-
     // スプレッドシートに貼り付ける
     const record = f.createArray();
 
@@ -188,13 +185,11 @@ function recievePostback(event) {
     const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName("Data");
     sheet.appendRow(record);
 
+
+    //フォームを送信する
+    f.sendForm();
+
   } catch (e) {
-    GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", event.postback.data);
-
-    GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", event.event.postback.data.match(/\[.*?_/)[0].replace("[", "").replace("_", ""));
-
-    GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", event.postback.data.match(/Form\d+|終了/)[0]);
-
     GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", e.message);
   }
 

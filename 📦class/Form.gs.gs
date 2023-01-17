@@ -13,7 +13,7 @@ class Form {
     this.mode = event.mode;
     this.scenario = event.postback.data.match(/\[.*?_/)[0].replace("[", "").replace("_", ""); //followなど
     this.formZone = parseInt(event.postback.data.match(/Form\d+/)[0].replace("Form", "")); //form1から1を数値型として抽出したもの
-    this.formNumber = event.postback.data.match(/Q\d+|終了/)[0]; //Q1など
+    this.answerNumber = event.postback.data.match(/A\d+|終了/)[0]; //Q1など
 
   }
 
@@ -22,15 +22,29 @@ class Form {
 
     const l = new LINE();
 
-    if (this.formNumber !== "終了") {
-      const messageObject = FORM_ENUM[`${this.scenario}_Form`][this.formZone + 2];
+    if (this.answerNumber !== "終了") {
+      const messageObject = FORM_ENUM[`${this.scenario}_Form`][this.formZone];
       l.sendUniquePushMessage(messageObject, this.userId);
     }
+
+    //回答ありがとうございました。
+    if (this.answerNumber === "終了") {
+      const messageObject = [{
+        "type": "text",
+        "text": "ご回答ありがとうございました🐎🚜リッチメニューより特典を受け取ってください",
+      }
+      ];
+
+      l.sendUniquePushMessage(messageObject, this.userId);
+    }
+
   }
+
+
 
   /** スプレッドシートに貼り付ける用の2次元配列を作成するメソッド */
   createArray() {
-    return [this.messageType, this.userMessage, this.timestamp, this.userId, "", this.mode, this.scenario, this.formZone, this.formNumber];
+    return [this.messageType, this.userMessage, this.timestamp, this.userId, "", this.mode, this.scenario, this.formZone, this.answerNumber];
   }
 
 
