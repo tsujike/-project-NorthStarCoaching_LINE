@@ -19,8 +19,8 @@ function setPropertyStore() {
 
 const messageObjectEnum = {
 
-  followForm1: [
-    {
+  follow_Form: [
+    [{//follow_Form[0]
       "type": "template",
       "altText": "アンケートに回答ください",
       "template": {
@@ -31,33 +31,31 @@ const messageObjectEnum = {
           {
             "type": "postback",
             "label": "会社役員",
-            "data": "[follow_Form1]会社役員", //.postback.dataで文字列を返す
+            "data": "[follow_Form1_Q1]会社役員", //.postback.dataで文字列を返す
             "displayText": "会社役員"
           },
           {
             "type": "postback",
             "label": "会社員",
-            "data": "[follow_Form1]会社員", //.postback.dataで文字列を返す
+            "data": "[follow_Form1_Q2]会社員", //.postback.dataで文字列を返す
             "displayText": "会社員"
           },
           {
             "type": "postback",
             "label": "自営業・フリーランス",
-            "data": "[follow_Form1]自営業・フリーランス", //.postback.dataで文字列を返す
+            "data": "[follow_Form1_Q3]自営業・フリーランス", //.postback.dataで文字列を返す
             "displayText": "自営業・フリーランス"
           },
           {
             "type": "postback",
             "label": "その他",
-            "data": "[お友だち追加時_質問1]その他", //.postback.dataで文字列を返す
+            "data": "[follow_Form1_Q4]その他", //.postback.dataで文字列を返す
             "displayText": "その他"
           }
         ]
       }
-    }
-  ],
-  followForm2: [
-    {
+    }],
+    [{//follow_Form[1]
       "type": "template",
       "altText": "アンケートに回答ください",
       "template": {
@@ -68,26 +66,27 @@ const messageObjectEnum = {
           {
             "type": "postback",
             "label": "男性",
-            "data": "[follow_Form2]男性",
+            "data": "[follow_Form2_Q1]男性",
             "displayText": "男性"
           },
           {
             "type": "postback",
             "label": "女性",
-            "data": "[follow_Form2]女性",
+            "data": "[follow_Form2_Q2]女性",
             "displayText": "女性"
           },
           {
             "type": "postback",
             "label": "その他・回答しない",
-            "data": "[Follow_終了]その他・回答しない",
+            "data": "[follow_Form2_終了]その他・回答しない",
             "displayText": "その他・回答しない"
           }
         ]
       }
     }
-  ]
+    ]
 
+  ]
 };
 
 const FORM_ENUM = Object.freeze(messageObjectEnum);

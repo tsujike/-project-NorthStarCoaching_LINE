@@ -101,7 +101,7 @@ function recieveFollow(event) {
 
       //3秒後
       Utilities.sleep(1000);
-      const messageObject3 = FORM_ENUM.followForm1;
+      const messageObject3 = FORM_ENUM["follow_Form"][0];
       l.sendUniquePushMessage(messageObject3, userId);
 
     }

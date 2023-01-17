@@ -12,8 +12,9 @@ class Form {
     this.userId = event.source.userId;
     this.mode = event.mode;
     this.scenario = event.postback.data.match(/\[.*?_/)[0].replace("[", "").replace("_", ""); //followなど
-    this.formZone = event.postback.data.match(/Form\d+|終了/)[0]; //form1など
-    this.messageObject = FORM_ENUM[`${this.scenario}${this.formZone}`];
+    this.formZone = parseInt(event.postback.data.match(/Form\d+/)[0].replace("Form", "")); //form1から1を数値型として抽出したもの
+    this.formNumber = event.postback.data.match(/Q\d+|終了/)[0]; //Q1など
+
   }
 
   /** 個別メッセージを送信するメソッド */
@@ -21,14 +22,15 @@ class Form {
 
     const l = new LINE();
 
-    if (this.formZone !== "終了") {
-      l.sendUniquePushMessage(this.messageObject, this.userId);
+    if (this.formNumber !== "終了") {
+      const messageObject = FORM_ENUM[`${this.scenario}_Form`][this.formZone + 2];
+      l.sendUniquePushMessage(messageObject, this.userId);
     }
   }
 
   /** スプレッドシートに貼り付ける用の2次元配列を作成するメソッド */
   createArray() {
-    return [this.messageType, this.userMessage, this.timestamp, this.userId, "", this.mode, this.scenario, this.formZone];
+    return [this.messageType, this.userMessage, this.timestamp, this.userId, "", this.mode, this.scenario, this.formZone, this.formNumber];
   }
 
 
