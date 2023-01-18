@@ -33,7 +33,7 @@ function trainingCreateCreateRichMenu() {
         },
         "action": {
           "type": "postback",
-          "data": "リッチメニュー（左）がタップされました",
+          "data": "[Free_RichMenu1_A1]リッチメニュー（左）がタップされました",
           "displayText": "リッチメニュー（左）がタップされました",
         }
       },
@@ -46,7 +46,7 @@ function trainingCreateCreateRichMenu() {
         },
         "action": {
           "type": "postback",
-          "data": "リッチメニュー（右）がタップされました",
+          "data": "[Free_RichMenu1_A2]リッチメニュー（右）がタップされました",
           "displayText": "リッチメニュー（右）がタップされました",
         }
       },
@@ -84,7 +84,7 @@ function trainingGetRichMenuIds() {
 
   const richMenuIds = UrlFetchApp.fetch(url, options);
   const ids = JSON.parse(richMenuIds);
-  console.log(ids.richmenus[2].areas);
+  // console.log(ids.richmenus[2].areas);
   return ids;
 
 }
@@ -97,7 +97,7 @@ function setValuesRichMenuIds() {
   const values = ids.map(element => { return Object.values(element) });
 
   //nameでソートする
-  values.sort((a, b) => { return b[1] - a[1] });
+  values.sort((a, b) => { return a[1] < b[1] ? -1 : 1; });
 
   const SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
   const sheetName = 'リッチメニュー一覧';
@@ -151,7 +151,7 @@ function trainingSendRichMenuToUser() {
 
   const ACCESS_TOKEN = PropertiesService.getScriptProperties().getProperty("ACCESS_TOKEN");
 
-  const richMenuId = trainingGetRichMenuIds().richmenus[2].richMenuId;
+  const richMenuId = trainingGetRichMenuIds().richmenus[0].richMenuId;
 
   const url = `https://api.line.me/v2/bot/user/${TESTUSER_ID}/richmenu/${richMenuId}`;
   const headers = {
@@ -174,7 +174,7 @@ function trainingDeleteRichMenu() {
 
   const ACCESS_TOKEN = PropertiesService.getScriptProperties().getProperty("ACCESS_TOKEN");
 
-  const richMenuId = trainingGetRichMenuIds().richmenus[2].richMenuId;
+  const richMenuId = trainingGetRichMenuIds().richmenus[0].richMenuId;
 
   const url = `https://api.line.me/v2/bot/richmenu/${richMenuId}`;
   const headers = {

@@ -177,7 +177,7 @@ function recievePostback(event) {
 
     const sourceType = event.postback.data.match(/(Form|RichMenu)/)[0];
 
-    //フォームを送信する
+    //フォームを受け取ってフォームを送信したり終了メッセージを送信する
     if (sourceType === "Form") {
       const f = new Form(event);
       f.sendForm();
@@ -190,9 +190,19 @@ function recievePostback(event) {
       sheet.appendRow(record);
     }
 
-    //フォームを送信する
+    //リッチメニューを受け取ってアクションを起こす
     if (sourceType === "RichMenu") {
-      //なにもしない
+
+      const r = new RichMenu(event);
+      r.sendMessage();
+
+      // スプレッドシートに貼り付ける（ソースタイプによってプロパティが違うから共通化できないんじゃないかな）
+      const record = r.createArray();
+
+      const SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+      const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName("Data");
+      sheet.appendRow(record);
+
     }
 
 
