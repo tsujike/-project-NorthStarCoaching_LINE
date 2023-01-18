@@ -1,81 +1,62 @@
-class LINE {
+class LINERichMenu {
 
   constructor() {
     const properties = PropertiesService.getScriptProperties();
     this.ACCESS_TOKEN = properties.getProperty("ACCESS_TOKEN");
   }
 
-  /** ブロードバンドメッセージ */
-  sendBroadbandMessage(messageObject) {
 
-    const url = 'https://api.line.me/v2/bot/message/broadcast';
-    const headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer ' + this.ACCESS_TOKEN
-    };
 
-    const payload = {
-      'messages': messageObject
-    }
 
-    const options = {
-      'headers': headers,
-      'method': 'post',
-      'payload': JSON.stringify(payload)
-    };
+  /** 個別ユーザーにリッチメニューを送信するメソッド
+  * @param{string} メッセージオブジェクトのJSON
+  * @param{string} ユーザーID
+  */
+  sendRichMenu(messageObject, userId) {
 
-    // 送信
-    UrlFetchApp.fetch(url, options);
-    return "メッセージを送信しました"
 
   }
 
+  /** リッチメニューをアップロードするメソッド
+  * @param{string} メッセージオブジェクトのJSON
+  * @param{string} ユーザーID
+  */
+  sendRichMenu(messageObject, userId) {
 
-  /** リプライメッセージ
-   * @param{string} メッセージオブジェクトのJSON
-   * @param{string} リプレイトークン
-   */
-  sendReplyMessage(messageObject, replyToken) {
 
-    const url = "https://api.line.me/v2/bot/message/reply";
+  }
+
+  /** リッチメニューを作成するメソッド */
+  createRichMenu() {
+
+    const url = "https://api.line.me/v2/bot/richmenu";
     const headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
+      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + this.ACCESS_TOKEN,
     };
 
     const payload = {
-      'messages': messageObject,
-      'replyToken': replyToken,
-    }
-
-    const options = {
-      'headers': headers,
-      'method': 'post',
-      'payload': JSON.stringify(payload),
-    };
-
-    UrlFetchApp.fetch(url, options);
-    return "メッセージを送信しました"
-
-  }
-
-
-
-  /** 個別ユーザーにPUSHメッセージ
- * @param{string} メッセージオブジェクトのJSON
- * @param{string} ユーザーID
- */
-  sendUniquePushMessage(messageObject, userId) {
-
-    const url = "https://api.line.me/v2/bot/message/push";
-    const headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer ' + this.ACCESS_TOKEN,
-    };
-
-    const payload = {
-      'messages': messageObject,
-      'to': userId,
+      "size": {
+        "width": 2500,
+        "height": 1686
+      },
+      "selected": true,
+      "name": "richMenu_follow",
+      "chatBarText": "Tap here",
+      "areas": [
+        {
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 2500,
+            "height": 1686
+          },
+          "action": {
+            "type": "postback",
+            "data": "リッチメニューがタップされました"
+          }
+        }
+      ]
     };
 
     const options = {
@@ -88,7 +69,6 @@ class LINE {
     return "メッセージを送信しました"
 
   }
-
 
 
 }

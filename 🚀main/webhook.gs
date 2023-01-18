@@ -175,19 +175,29 @@ function recievePostback(event) {
     //1秒後
     Utilities.sleep(1000);
 
-    //インスタンス生成
-    const f = new Form(event);
-
-    // スプレッドシートに貼り付ける
-    const record = f.createArray();
-
-    const SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName("Data");
-    sheet.appendRow(record);
-
+    const sourceType = event.postback.data.match(/(Form|RichMenu)/)[0];
 
     //フォームを送信する
-    f.sendForm();
+    if (sourceType === "Form") {
+      const f = new Form(event);
+      f.sendForm();
+
+      // スプレッドシートに貼り付ける（ソースタイプによってプロパティが違うから共通化できないんじゃないかな）
+      const record = f.createArray();
+
+      const SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+      const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName("Data");
+      sheet.appendRow(record);
+    }
+
+    //フォームを送信する
+    if (sourceType === "RichMenu") {
+      //なにもしない
+    }
+
+
+
+
 
   } catch (e) {
     GmailApp.sendEmail("kenzo@jugani-japan.com", "errorです", e.message);

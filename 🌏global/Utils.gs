@@ -12,6 +12,8 @@ function setPropertyStore() {
   // const SPREADSHEET_ID = "ここにスプレッドシートIDを入力して実行する";
   // properties.setProperty('SPREADSHEET_ID', SPREADSHEET_ID);
 
+  // const TESTUSER_ID = "ここにユーザーIDを入力して実行する";
+  // properties.setProperty('TESTUSER_ID', TESTUSER_ID);
 
 
 }
