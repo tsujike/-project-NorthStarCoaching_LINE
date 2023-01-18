@@ -1,5 +1,15 @@
 //マニュアル　https://developers.line.biz/ja/reference/messaging-api/#create-rich-menu
 
+//リッチメニューを特定のユーザーにリンクさせる（送信する）手順
+//1. Canvaで画像を作成する * canva URL https://www.canva.com/design/DAFXX0F5AhQ/PKu5ukTW4ySPRhQF5Dyrzg/edit
+//2. Google Driveにアップロードして、imageIDを取得してD列に入力する
+//3. 🌏global/Enum_RichMenuに、新規リッチメニューオブジェクトを追加する
+//4. 
+//2. 
+//2. 
+//2. 
+//.スプレッドシートのA～D列に対して、2行目に新規レコードを作成する
+
 
 /** リッチメニューを作成しよう */
 //エンドポイント

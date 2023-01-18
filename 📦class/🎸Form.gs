@@ -23,7 +23,7 @@ class Form {
     const l = new LINE();
 
     if (this.answerNumber !== "終了") {
-      const messageObject = FORM_ENUM[`${this.scenario}_Form`][this.formZone];
+      const messageObject = ENUM_FORM[`${this.scenario}_Form`][this.formZone];
       l.sendUniquePushMessage(messageObject, this.userId);
     }
 
