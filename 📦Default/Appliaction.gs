@@ -1,3 +1,112 @@
+//　# スクリプトファイル目次
+//　各クラスは　/** 🔚 End 🔚 */　で区切ってます。
+// ## クラス
+// - Follow
+// - UnFollow
+
+// ## ユーティリティ系
+
+
+//アプリケーション層
+//データベースや外部システムとの通信を担当するリポジトリクラスや
+//外部システムとのインターフェースを提供するサービスクラスなどを持ちます
+//設計は「Appliaction」という名前からスタートします
+class Application {
+
+  /** 
+    * @constructor
+    * @param{object} Webhookイベントオブジェクト
+    */
+  constructor(event) {
+    this.event = event;
+
+    //ドメインオブジェクト群
+    this.domainObjects = {
+      Follow: new Follow(this.event),
+      UnFollow: new UnFollow(this.event),
+      SpotInquiry: new SpotInquiry(this.event)
+      //ドメインオブジェクトに変更があったら足す
+    }
+  }
+
+  /** 特定のドメインオブジェクトの課題を処理するメソッド
+   */
+  getSolutions() {
+    const domainObject = this.getDomainObject_();
+    const result = domainObject.getSolution();
+    return result
+  }
+
+
+  /** ドメインオブジェクトを取得するメソッド
+   * @return{object} ドメインオブジェクト
+   */
+  getDomainObject_() {
+    const domainObjects = this.domainObjects;
+    for (const domainObjectName in domainObjects) {
+      if (domainObjects[domainObjectName].isDomainObject()) {
+        return domainObjects[domainObjectName]
+      }
+    }
+  }
+
+
+  /** Helloを返すメソッド
+   * @return{object} ドメインオブジェクト
+   */
+  getHello() {
+    return "Hello! I'm Application"
+  }
+}
+
+
+//上記クラスのテスト関数
+function test_Appliaction() {
+
+  const exports = GASUnit.exports
+  const assertThat = AssertGAS.assertThat
+
+  exports({
+    'Appliaction': {
+      '#domainObjects': {
+        'FOLLOWオブジェクトを返すはず': function () {
+          const e = FOLLOW_WebhookEvent_SAMPLE;
+          const event = JSON.parse(e.postData.contents).events[0];
+          const a = new Application(event);
+          const domainObject = a.domainObjects["Follow"];
+          const result = domainObject.name;
+          const expectation = "Follow"
+          assertThat(result).is(expectation);
+        },
+        'UNFOLLOWドメインオブジェクトを返す': function () {
+          const e = UNFOLLOW_WebhookEvent_SAMPLE;
+          const event = JSON.parse(e.postData.contents).events[0];
+          const a = new Application(event);
+          const domainObject = a.domainObjects["UnFollow"];
+          const result = domainObject.name;
+          const expectation = "UnFollow"
+          assertThat(result).is(expectation);
+        },
+        'SpotInquiryオブジェクトを返': function () {
+          const e = SpotInquiry_WebhookEvent_SAMPLE;
+          const event = JSON.parse(e.postData.contents).events[0];
+          const a = new Application(event);
+          const domainObject = a.domainObjects["SpotInquiry"];
+          const result = domainObject.name;
+          const expectation = "SpotInquiry"
+          assertThat(result).is(expectation);
+        },
+      }
+    }
+  })
+}
+
+
+/** 🔚 End 🔚 */
+
+
+
+
 /** リッチメニューに関するクラス */
 class RichMenu {
 
@@ -227,3 +336,64 @@ function testRichMenu() {
 
 
 }
+
+
+
+
+/** 🔚 End 🔚 */
+
+
+
+/** FORMクラス */
+class Form {
+
+  /** 
+    * @constructor
+    * @param{object} イベントオブジェクト
+    */
+  constructor(event) {
+    this.messageType = event.type;
+    this.userMessage = event.postback.data;
+    this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
+    this.userId = event.source.userId;
+    this.mode = event.mode;
+    this.scenario = event.postback.data.match(/\[.*?_/)[0].replace("[", "").replace("_", ""); //followなど
+    this.formZone = parseInt(event.postback.data.match(/Form\d+/)[0].replace("Form", "")); //form1から1を数値型として抽出したもの
+    this.answerNumber = event.postback.data.match(/A\d+|終了/)[0]; //Q1など
+
+  }
+
+  /** 個別メッセージを送信するメソッド */
+  sendForm() {
+
+    const l = new LINE();
+
+    if (this.answerNumber !== "終了") {
+      const messageObject = ENUM_FORM[`${this.scenario}_Form`][this.formZone];
+      l.sendUniquePushMessage(messageObject, this.userId);
+    }
+
+    //回答ありがとうございました。
+    if (this.answerNumber === "終了") {
+      const messageObject = [{
+        "type": "text",
+        "text": "ご回答ありがとうございました🐎🚜リッチメニューより特典を受け取ってください",
+      }
+      ];
+
+      l.sendUniquePushMessage(messageObject, this.userId);
+    }
+
+  }
+
+
+
+  /** スプレッドシートに貼り付ける用の2次元配列を作成するメソッド */
+  createArray() {
+    return [this.messageType, this.userMessage, this.timestamp, this.userId, "", this.mode, this.scenario, this.formZone, this.answerNumber];
+  }
+
+
+}
+
+

@@ -1,27 +1,37 @@
-/** メッセージが送付された際に、実行される関数 */
-// function doPost(e) {
+/** LINEをトリガーとするイベントハンドラー
+ * @param{object} Webhookイベントオブジェクト(中身はJSON) 
+ */
+function doPost(e) {
 
-//   //1つのWebhookに1件のイベントオブジェクトと仮定して・・・
-//   const event = JSON.parse(e.postData.contents).events[0];
+  try {
+    //アプリケーション層に単体のイベントを渡して、ドメインオブジェクト（どの業務を行うのか）を決定する
+    const event = JSON.parse(e.postData.contents).events[0];
+    const app = new Application(event);
 
-//   const eventType = event.type;
+    //テスト用に戻り値を変数に格納しておく
+    const result = app.getSolutions();
+    return result
 
-//   switch (eventType) {
-//     case "message":
-//       recieveMessage(event);
-//       break;
-//     case "follow":
-//       recieveFollow(event);
-//       break;
-//     case "unfollow":
-//       recieveUnfollow(event);
-//       break;
-//     case "postback":
-//       recievePostback(event);
-//       break;
-//   }
+  } catch (error) {
+    const ADMIN_EMAIL = PropertiesService.getScriptProperties().getProperty("ADMIN_EMAIL");
+    GmailApp.sendEmail(ADMIN_EMAIL, "【NORTH STAR COACHING】でError", error.message);
+  }
 
-// }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**
