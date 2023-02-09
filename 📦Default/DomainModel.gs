@@ -39,19 +39,17 @@ class Follow {
     const flag = this.isNewUser_();
 
     //ファーストメッセージ送信
-    flag ? this.greetingToNewUser_() : this.greetingToFormerUser_();
+    flag ? this.greetingToFormerUser_() : this.greetingToNewUser_();
 
-
-    //スプレッドシートに出力
-    const d = new DataSheet();
-    d.appendRowEvent(this.event);
-
-    //成功処理？
-    const ADMIN_EMAIL = PropertiesService.getScriptProperties().getProperty("ADMIN_EMAIL");
-    GmailApp.sendEmail(ADMIN_EMAIL, "成功です", "ブロック解除");
+    //ファーストフォーム送信
+    this.sendFirstForm_();
 
     return "Followオブジェクトは課題を解決したのでメールを送信しました"
   }
+
+
+
+
 
   /** ドメインオブジェクト判定メソッド
    * @return{boolean} 
@@ -87,9 +85,12 @@ class Follow {
     }
     ];
 
+    //スプレッドシートに出力
+    const d = new DataSheet();
+    d.appendRowFollowEvent(this.event);
+
     //LINEインスタンス生成
-    const l = new LINE();
-    l.sendReplyMessage(messageObject, this.replyToken);
+    new LINE().sendReplyMessage(messageObject, this.replyToken);
   }
 
 
@@ -102,56 +103,34 @@ class Follow {
     }
     ];
 
+    //スプレッドシートに出力
+    const d = new DataSheet();
+    d.appendRowFollowEvent(this.event);
+
     //LINEインスタンス生成
-    const l = new LINE();
-    l.sendReplyMessage(messageObject, this.replyToken);
+    new LINE().sendReplyMessage(messageObject, this.replyToken);
   }
 
 
+  /** ファーストフォームを送信するメソッド */
+  sendFirstForm_() {
+    //5秒後　
+    Utilities.sleep(1000);
 
+    const messageObject2 = [{
+      "type": "text",
+      "text": "さっそく、かんたんなアンケートにご回答ください✍️",
+    }
+    ];
 
+    //LINEインスタンス生成
+    new LINE().sendUniquePushMessage(messageObject2, this.userId);
 
-  // //本番では、if (!result)に変更する
-  // if(result) { //はじめまして
-  //   const messageObject = [{
-  //     "type": "text",
-  //     "text": "お友だち登録ありがとうございます⭐これから一緒に目標達成をサポートさせていただきます。通知が多いなと思ったら通知オフ📵にしてください。",
-  //   }
-  //   ];
-  //   l.sendReplyMessage(messageObject, replyToken);
-
-  //   //5秒後　
-  //   Utilities.sleep(1000);
-  //   const messageObject2 = [{
-  //     "type": "text",
-  //     "text": "さっそく、かんたんなアンケートにご回答ください✍️",
-  //   }
-  //   ];
-  //   l.sendUniquePushMessage(messageObject2, userId);
-
-
-
-  //   //3秒後
-  //   Utilities.sleep(1000);
-  //   const messageObject3 = ENUM_FORM["follow_Form"][0];
-  //   l.sendUniquePushMessage(messageObject3, userId);
-
-  // }
-
-  // //本番では、if (result)に変更する
-  // if(result) { //ブロック解除
-  //   const messageObject = [{
-
-  //     "type": "text",
-  //     "text": "ブロック解除ありがとうございます⭐引き続きよろしくお願いします🐎🚜",
-  //   }
-  //   ];
-
-  //   l.sendReplyMessage(messageObject, replyToken);
-
-  // }
-
-
+    //3秒後
+    Utilities.sleep(1000);
+    const messageObject3 = ENUM_FORM["follow_Form"][0];
+    new LINE().sendUniquePushMessage(messageObject3, this.userId);
+  }
 
 
 
@@ -175,13 +154,16 @@ class UnFollow {
 
     this.userMessage = "ブロック😨";
     this.type = event.type;
-    this.mode = event.mode;
     this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
     this.sourceUserId = event.source.userId;
   }
 
   /** ドメインオブジェクトのエントリポイントと言える課題解決メソッド */
   getSolution() {
+
+    //スプレッドシートに出力
+    const d = new DataSheet();
+    d.appendRowUnfollowEvent(this.event);
 
     //成功処理？
     const ADMIN_EMAIL = PropertiesService.getScriptProperties().getProperty("ADMIN_EMAIL");
@@ -190,6 +172,7 @@ class UnFollow {
     return "UnFollowオブジェクトは課題を解決したのでメールを送信しました"
 
   }
+
   /** ドメインオブジェクト判定メソッド */
   isDomainObject() {
     return this.type === "unfollow" ? true : false

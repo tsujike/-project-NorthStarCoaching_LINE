@@ -35,13 +35,13 @@ function test_doPost() {
   exports({
     'LINE公式アカウントのテストです': {
       '#doPost(e)のテストです': {
-        // 'SpotInquryオブジェクトテスト': function () {
-        //   const e = SpotInqury_WebhookEvent_SAMPLE;
+        // 'SpotInquiryオブジェクトテスト': function () {
+        //   const e = SpotInquiry_WebhookEvent_SAMPLE;
         // const result = doPost(e);
         // const expectation = "SpotInquiryオブジェクトは課題を解決したのでメールを送信しました"
         // assertThat(result).is(expectation);
         // },
-        // 'Followオブジェクトテスト': function () {
+        // 'Followオブジェクトテスト': function () {　//replyTokenがあるから通らないよ
         //   const e = FOLLOW_WebhookEvent_SAMPLE;
         //   const result = doPost(e);
         //   const expectation = "Followオブジェクトは課題を解決したのでメールを送信しました"

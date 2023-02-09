@@ -46,21 +46,32 @@ class DataSheet {
   }
 
 
-  /** 1イベントを最下行に追加するメソッド
+  /** お友だち追加時にレコードを追加するメソッド
    * @param{array} event
    * @return{boolean} 
    */
-  appendRowEvent(event) {
-
-    //変数に格納
+  appendRowFollowEvent(event) {
     const messageType = event.type;
-    const userMessage = "ブロック解除";
     const timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
     const userId = event.source.userId;
     const replyToken = event.replyToken;
     const mode = event.mode;
+    
+    const record = [messageType,"ブロック解除", timestamp, userId, replyToken, mode];
+    this.sheet.appendRow(record);
+  }
 
-    const record = [messageType, userMessage, timestamp, userId, replyToken, mode];
+    /** ブロック時にレコードを追加するメソッド
+   * @param{array} event
+   * @return{boolean} 
+   */
+  appendRowUnfollowEvent(event) {
+    const messageType = event.type;
+    const timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
+    const userId = event.source.userId;
+    const mode = event.mode;
+
+    const record = [messageType, "ブロック😨", timestamp, userId, "", mode];
     this.sheet.appendRow(record);
   }
 
