@@ -59,3 +59,25 @@ function test_array() {
 
 
 
+//処理の流れ
+
+//LINEからWebhookイベントを、doPost(e)←デプロイされている、が受け取る 
+//単体のイベントオブジェクトを取得する
+//const event = JSON.parse(e.postData.contents).events[0];
+
+//それをアプリケーション層に渡しながらインスタンスを生成する 
+//const app = new Application(event);
+//（アプリケーション層のコンストラクタでは、ドメインオブジェクトを選択する装置が実装されている）
+//（判定のために、各ドメインオブジェクトにisDomainObject()メソッドが実装されていることが特徴的。判定だからネストが深くなる可能性高い💦）
+
+//アプリケーション層のメソッドを走らせる（戻り値は処理とは関係ない）ポリモーフィズム
+//const result = app.getSolutions();
+
+//ドメインオブジェクトのgetSolution()メソッドを実行する。（これもポリモーフィズム）
+// const domainObject = this.getDomainObject_();
+// const result = domainObject.getSolution();
+
+//ドメインオブジェクトのgetSolution()メソッドでは、ドメインオブジェクトの責務(ドメインオブジェクトのエントリポイントと言える課題解決メソッド)が書かれている。処理はなんでもOK
+//さらにサブメソッドを呼び出すことは、ザラにあるでしょう。
+
+

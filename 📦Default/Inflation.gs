@@ -56,15 +56,15 @@ class DataSheet {
     const userId = event.source.userId;
     const replyToken = event.replyToken;
     const mode = event.mode;
-    
-    const record = [messageType,"ブロック解除", timestamp, userId, replyToken, mode];
+
+    const record = [messageType, "ブロック解除", timestamp, userId, replyToken, mode];
     this.sheet.appendRow(record);
   }
 
-    /** ブロック時にレコードを追加するメソッド
-   * @param{array} event
-   * @return{boolean} 
-   */
+  /** ブロック時にレコードを追加するメソッド
+ * @param{array} event
+ * @return{boolean} 
+ */
   appendRowUnfollowEvent(event) {
     const messageType = event.type;
     const timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
@@ -72,6 +72,26 @@ class DataSheet {
     const mode = event.mode;
 
     const record = [messageType, "ブロック😨", timestamp, userId, "", mode];
+    this.sheet.appendRow(record);
+  }
+
+  /** PostBack時にレコードを追加するメソッド
+ * @param{array} event
+ * @return{boolean} 
+ */
+  appendRowPostBackEvent(event) {
+    const messageType = event.type;
+    const userMessage = event.postback.data;
+    const timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
+    const userId = event.source.userId;
+    const mode = event.mode;
+    const scenario = event.postback.data.match(/\[.*?_/)[0].replace("[", "").replace("_", ""); //followなど
+    const formZone = event.postback.data.match(/Form\d+|終了/)[0]; //form1など
+    const answerNumber = event.postback.data.match(/(?<=\[follow_Form\d_)[A-Z]\d(?=\])/)[0];
+    const answerText = event.postback.data.match(/(?<=\])\S+/)[0];
+
+    const record = [messageType, userMessage, timestamp, userId, "", mode, scenario, formZone,answerNumber,answerText];
+
     this.sheet.appendRow(record);
   }
 

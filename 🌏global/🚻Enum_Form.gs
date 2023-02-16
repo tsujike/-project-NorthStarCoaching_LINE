@@ -6,7 +6,7 @@ const messageObjectEnum = {
       "altText": "アンケートに回答ください",
       "template": {
         "type": "buttons",
-        "title": "ご職業は？",
+        "title": "ご職業は？（1/10問）",
         "text": "以下の中からお選びください",
         "actions": [
           {
@@ -41,7 +41,7 @@ const messageObjectEnum = {
       "altText": "アンケートに回答ください",
       "template": {
         "type": "buttons",
-        "title": "性別は？",
+        "title": "性別は？（2/10問）",
         "text": "以下の中からお選びください",
         "actions": [
           {
@@ -71,34 +71,58 @@ const messageObjectEnum = {
       "altText": "アンケートに回答ください",
       "template": {
         "type": "buttons",
-        "title": "年齢は？",
+        "title": "年齢は？（3/10問）",
         "text": "以下の中からお選びください",
         "actions": [
           {
             "type": "postback",
             "label": "20代以下",
-            "data": "[follow_Form3_終了]20代以下",
+            "data": "[follow_Form3_A1]20代以下",
             "displayText": "20代以下"
           },
           {
             "type": "postback",
             "label": "30～40代",
-            "data": "[follow_Form3_終了]30～40代",
+            "data": "[follow_Form3_A2]30～40代",
             "displayText": "30～40代"
           },
           {
             "type": "postback",
             "label": "40～50代",
-            "data": "[follow_Form3_終了]40～50代",
+            "data": "[follow_Form3_A3]40～50代",
             "displayText": "40～50代"
           },
           {
             "type": "postback",
             "label": "50代以上",
-            "data": "[follow_Form3_終了]50代以上",
+            "data": "[follow_Form3_A4]50代以上",
             "displayText": "50代以上"
           }
 
+        ]
+      }
+    }
+    ],
+    [{//follow_Form[3]
+      "type": "template",
+      "altText": "ご回答ありがとうございました。",
+      "template": {
+        "type": "buttons",
+        "title": "終了🎉",
+        "text": "アンケートを終了しますか？",
+        "actions": [
+          {
+            "type": "postback",
+            "label": "終了する",
+            "data": "[follow_Form4_A1]終了",
+            "displayText": "終了する"
+          },
+          {
+            "type": "postback",
+            "label": "もう一度アンケートを送信する",
+            "data": "[follow_Form5_A2]再送",
+            "displayText": "もう一度アンケートを送信する"
+          }
         ]
       }
     }

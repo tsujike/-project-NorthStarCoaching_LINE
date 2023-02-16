@@ -24,7 +24,8 @@ class Application {
     this.domainObjects = {
       Follow: new Follow(this.event),
       UnFollow: new UnFollow(this.event),
-      SpotInquiry: new SpotInquiry(this.event)
+      SpotInquiry: new SpotInquiry(this.event),
+      FollowForm: new FollowForm(this.event)
       //ドメインオブジェクトに変更があったら足す
     }
   }
@@ -32,9 +33,15 @@ class Application {
   /** 特定のドメインオブジェクトの課題を処理するメソッド
    */
   getSolutions() {
-    const domainObject = this.getDomainObject_();
-    const result = domainObject.getSolution();
-    return result
+
+    try {
+
+      const domainObject = this.getDomainObject_();
+      const result = domainObject.getSolution();
+      return result
+    } catch (e) {
+      GmailApp.sendEmail("kenzo@jugani-japan.com", "アプリケーション層のgetSolutionsでerrorです", e.message);
+    }
   }
 
 
@@ -42,22 +49,22 @@ class Application {
    * @return{object} ドメインオブジェクト
    */
   getDomainObject_() {
-    const domainObjects = this.domainObjects;
-    for (const domainObjectName in domainObjects) {
-      if (domainObjects[domainObjectName].isDomainObject()) {
-        return domainObjects[domainObjectName]
+
+    try {
+      const domainObjects = this.domainObjects;
+      for (const domainObjectName in domainObjects) {
+        if (domainObjects[domainObjectName].isDomainObject()) {
+          return domainObjects[domainObjectName]
+        }
       }
+    } catch (e) {
+      GmailApp.sendEmail("kenzo@jugani-japan.com", "アプリケーション層のgetDomainObject_() でerrorです", e.message);
     }
   }
 
 
-  /** Helloを返すメソッド
-   * @return{object} ドメインオブジェクト
-   */
-  getHello() {
-    return "Hello! I'm Application"
-  }
 }
+
 
 
 //上記クラスのテスト関数

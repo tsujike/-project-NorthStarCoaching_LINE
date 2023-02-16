@@ -4,6 +4,11 @@
 // - Follow
 // - UnFollow
 // - SpotInquiry
+// - Follow2
+// - Follow3
+// - Follow5
+// - Follow6
+
 
 // ## ユーティリティ系
 // - richMenuEnum
@@ -20,13 +25,12 @@ class Follow {
     */
   constructor(event) {
 
+    //インスタンスで使いながら、コンストラクタでも使うので
+    this.event = event;
+
     //まぁ意味ないかもだけど、ちゃんとEnumから取得しようね
     this.name = ENUM_DomainObject.Follow.name;
 
-    //Webhookイベントオブジェクトを解析
-    this.event = event;
-
-    this.type = event.type; //isDomainObject()で使用
     this.replyToken = event.replyToken;　//greetingToNewUser_()とgreetingToFormerUser_()で使用
     this.userId = event.source.userId; //isNewUser_() で使用
     // this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss"); //いつか使いそう・・・
@@ -37,6 +41,9 @@ class Follow {
 
     //新規登録か出戻りか
     const flag = this.isNewUser_();
+
+    //初回アンケートに答えているかどうか
+    //TO DO
 
     //ファーストメッセージ送信
     flag ? this.greetingToFormerUser_() : this.greetingToNewUser_();
@@ -55,16 +62,10 @@ class Follow {
    * @return{boolean} 
    */
   isDomainObject() {
-    return this.type === "follow" ? true : false
+    return this.event.type === "follow" ? true : false
   }
 
 
-  /** Helloを返すメソッド
-   * @return{string}
-   */
-  getHello() {
-    return "Hello! I'm Follow オブジェクト"
-  }
 
   /** 新規お友だちかどうか判定するメソッド
  * @return{boolean} 
@@ -119,7 +120,7 @@ class Follow {
 
     const messageObject2 = [{
       "type": "text",
-      "text": "さっそく、かんたんなアンケートにご回答ください✍️",
+      "text": "さっそく、かんたんなアンケートにご回答ください✍️アンケートは10/10問です",
     }
     ];
 
@@ -146,14 +147,14 @@ class UnFollow {
      */
   constructor(event) {
 
+    //インスタンスで使いながら、コンストラクタでも使うので
+    this.event = event;
+
     //まぁ意味ないかもだけど、ちゃんとEnumから取得しようね
     this.name = ENUM_DomainObject.UnFollow.name;
 
-    //Webhookイベントオブジェクトを解析
-    this.event = event;
-
     this.userMessage = "ブロック😨";
-    this.type = event.type;
+
     this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
     this.sourceUserId = event.source.userId;
   }
@@ -167,7 +168,7 @@ class UnFollow {
 
     //成功処理？
     const ADMIN_EMAIL = PropertiesService.getScriptProperties().getProperty("ADMIN_EMAIL");
-    GmailApp.sendEmail(ADMIN_EMAIL, "成功です", this.userMessage);
+    GmailApp.sendEmail(ADMIN_EMAIL, "【NORTH STAR COACHING】がブロックされました", "気にしないでいきましょう");
 
     return "UnFollowオブジェクトは課題を解決したのでメールを送信しました"
 
@@ -175,14 +176,7 @@ class UnFollow {
 
   /** ドメインオブジェクト判定メソッド */
   isDomainObject() {
-    return this.type === "unfollow" ? true : false
-  }
-
-  /** Helloを返すメソッド
-   * @return{object} ドメインオブジェクト
-   */
-  getHello() {
-    return "Hello! I'm unFollow オブジェクト"
+    return this.event.type === "unfollow" ? true : false
   }
 
 
@@ -199,14 +193,13 @@ class SpotInquiry {
      */
   constructor(event) {
 
+    //インスタンスで使いながら、コンストラクタでも使うので
+    this.event = event;
+
     //まぁ意味ないかもだけど、ちゃんとEnumから取得しようね
     this.name = ENUM_DomainObject.SpotInquiry.name;
 
-    //Webhookイベントオブジェクトを解析
-    this.event = event;
-
     //こいつら、共通のものはいいけど、独自なものは、自分のメソッド内で呼び出さないとエラーなるよ
-    this.messageType = event.type;
     this.mode = event.mode;
     this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
     this.replyToken = event.replyToken;
@@ -215,17 +208,6 @@ class SpotInquiry {
 
   /** ドメインオブジェクトのエントリポイントと言える課題解決メソッド */
   getSolution() {
-    //ここの処理すごく長くなる気がするけどいいのかな？
-
-    //このように依存度が高い場合は
-    // const b = new B();
-    // b.something(/** 内部でnew A()している */)
-
-    //こうやって依存関係を解消する
-    // const a = new A();
-    // const b = new B(a);
-    // b.doSomething();
-
 
     //成功処理？
     const ADMIN_EMAIL = PropertiesService.getScriptProperties().getProperty("ADMIN_EMAIL");
@@ -237,8 +219,7 @@ class SpotInquiry {
 
   /** ドメインオブジェクト判定メソッド */
   isDomainObject() {
-    //ドメインオブジェクトの判定は、丁寧にやるべき
-    return this.messageType === "message" ? true : false
+    return this.event.type === "message" ? true : false
   }
 
 
@@ -253,8 +234,151 @@ class SpotInquiry {
 }
 
 
+/** 🔚 End 🔚 */
 
 
+
+/**お友だち登録時フォーム（いわゆる2問目以降）ドメインオブジェクト
+ * https://developers.line.biz/ja/reference/messaging-api/#follow-event
+ */
+class FollowForm {
+
+  /** 
+    * @constructor
+    * @param{object} Webhookイベントオブジェクト
+    */
+  constructor(event) {
+
+    //インスタンスで使いながら、コンストラクタでも使うので
+    this.event = event;
+
+    //まぁ意味ないかもだけど、ちゃんとEnumから取得しようね
+    this.name = ENUM_DomainObject.FollowForm.name;
+
+    this.replyToken = event.replyToken;　//greetingToNewUser_()とgreetingToFormerUser_()で使用
+    this.userId = event.source.userId; //isNewUser_() で使用
+    // this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss"); //いつか使いそう・・・
+
+  }
+
+  /** ドメインオブジェクトのエントリポイントと言える課題解決メソッド */
+  getSolution() {
+
+    try {
+
+      //スプレッドシートに出力
+      const d = new DataSheet();
+      d.appendRowPostBackEvent(this.event);
+
+      //今何問目？
+      const formZone = this.event.postback.data.match(/Form\d+|終了/)[0]; //Form2など
+
+      switch (formZone) {
+        case "Form1":
+          //2ndフォーム送信
+          this.sendForm2_();
+          break;
+        case "Form2":
+          //3rdフォーム送信
+          this.sendForm3_();
+          break;
+        case "Form3":
+          //4thフォーム送信
+          this.sendForm4_();
+          break;
+        case "Form4": //終了
+          //Endフォーム送信
+          this.sendFormEnd_();
+          break;
+        case "Form5": //再送
+          //フォーム1から送信させる
+          this.sendForm1_();
+          break;
+        default:
+        //処理
+      }
+
+
+      // //4thフォーム送信
+      // this.sendForm4_();
+
+      // //終了メッセージ送信
+      // this.sendFollowFormEnd_();
+
+    } catch (e) {
+      GmailApp.sendEmail("kenzo@jugani-japan.com", "FollowFormでerrorです", e.message);
+    }
+
+    return "FollowFormオブジェクトは課題を解決したのでメールを送信しました"
+  }
+
+
+
+
+
+  /** ドメインオブジェクト判定メソッド
+   * @return{boolean} 
+   */
+  isDomainObject() {
+    //受け取ったPostBackのメッセージに「follow_Form」が含まれていたらtrueを返す
+    const type = this.event.postback.data.match(/follow_Form/)[0];
+    return type === "follow_Form" ? true : false
+  }
+
+
+  /** 2ndフォームを送信するメソッド */
+  sendForm2_() {
+
+    //1秒後
+    Utilities.sleep(1000);
+    const messageObject = ENUM_FORM["follow_Form"][1];
+    new LINE().sendUniquePushMessage(messageObject, this.userId);
+  }
+
+
+  /** 3rdフォームを送信するメソッド */
+  sendForm3_() {
+    //1秒後
+    Utilities.sleep(1000);
+    const messageObject = ENUM_FORM["follow_Form"][2];
+    new LINE().sendUniquePushMessage(messageObject, this.userId);
+  }
+
+  /** 4thフォームを送信するメソッド */
+  sendForm4_() {
+    //1秒後
+    Utilities.sleep(1000);
+    const messageObject = ENUM_FORM["follow_Form"][3];
+    new LINE().sendUniquePushMessage(messageObject, this.userId);
+  }
+
+  /** 終了フォームを送信するメソッド */
+  sendFormEnd_() {
+    //1秒後
+    Utilities.sleep(1000);
+
+    const messageObject = [{
+      "type": "text",
+      "text": `ご回答ありがとうございました⭐キャンペーンクーポンは初回取引の際に適用させていただきます🎊引き続きよろしくお願いします🐎🚜
+
+URLなどを踏ませたいばあいはここに書く
+https://n-s-coaching.com`,
+    }
+    ];
+
+    new LINE().sendUniquePushMessage(messageObject, this.userId);
+  }
+
+    /** 1stフォームを送信するメソッド */
+  sendForm1_() {
+    //1秒後
+    Utilities.sleep(1000);
+    const messageObject = ENUM_FORM["follow_Form"][0];
+    new LINE().sendUniquePushMessage(messageObject, this.userId);
+  }
+
+
+}
 
 
 /** 🔚 End 🔚 */

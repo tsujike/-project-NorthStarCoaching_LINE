@@ -7,7 +7,8 @@ const SpotInquiry_WebhookEvent_SAMPLE = { postData: { contents: '{"destination":
 /**  日時選択アクションのポストバックイベントの場合 */
 const PostBack_WebhookEvent_SAMPLE = { postData: { contents: '{"destination":"xxxxxxxxxx","events":[{"replyToken":"b60d432864f44d079f6d8efe86cf404b","type":"postback","mode":"active","source":{"userId":"U91eeaf62d...","type":"user"},"timestamp":1513669370317,"webhookEventId":"01FZ74A0TDDPYRVKNK77XKC3ZR","deliveryContext":{"isRedelivery":false},"postback":{"data":"storeId=12345","params":{"datetime":"2017-12-25T01:00"}}}]}' } };
 
-
+/**  フォーム返答アクションのポストバックイベントの場合 */
+const FOLLOWFORM_WebhookEvent_SAMPLE = { postData: { contents: '{"destination":"xxxxxxxxxx","events":[{"replyToken":"b60d432864f44d079f6d8efe86cf404b","type":"postback","mode":"active","source":{"userId":"U91eeaf62d...","type":"user"},"timestamp":1513669370317,"webhookEventId":"01FZ74A0TDDPYRVKNK77XKC3ZR","deliveryContext":{"isRedelivery":false},"postback":{"data":"storeId=12345","params":{"datetime":"2017-12-25T01:00"}}}]}' } };
 
 const ENUM_DomainObject = {
 
@@ -27,5 +28,9 @@ const ENUM_DomainObject = {
     name: "PostBack",
     webhookEvent: PostBack_WebhookEvent_SAMPLE
   },
+  FollowForm: {
+    name: "FollowForm",
+    webhookEvent: FOLLOWFORM_WebhookEvent_SAMPLE
+  }
 
 };
