@@ -3,7 +3,7 @@
 // ## クラス
 // - Follow
 // - UnFollow
-// - SpotInquiry
+// - SpotMessage
 // - Follow2
 // - Follow3
 // - Follow5
@@ -33,7 +33,7 @@ class Follow {
 
     this.replyToken = event.replyToken;　//greetingToNewUser_()とgreetingToFormerUser_()で使用
     this.userId = event.source.userId; //isNewUser_() で使用
-    // this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss"); //いつか使いそう・・・
+    // this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss"); //いつか使いそう・・・午前午後判定とかね
   }
 
   /** ドメインオブジェクトのエントリポイントと言える課題解決メソッド */
@@ -53,9 +53,6 @@ class Follow {
 
     return "Followオブジェクトは課題を解決したのでメールを送信しました"
   }
-
-
-
 
 
   /** ドメインオブジェクト判定メソッド
@@ -80,23 +77,41 @@ class Follow {
   /** 新規ユーザーにファーストメッセージを送信するメソッド */
   greetingToNewUser_() {
 
-    const messageObject = [{
+    //スプレッドシートに出力
+    const d = new DataSheet();
+    d.appendRowFollowEvent(this.event);
+
+    const messageObject1 = [{
       "type": "text",
       "text": "お友だち登録ありがとうございます⭐これから一緒に目標達成をサポートさせていただきます。通知が多いなと思ったら通知オフ📵にしてください。",
     }
     ];
 
-    //スプレッドシートに出力
-    const d = new DataSheet();
-    d.appendRowFollowEvent(this.event);
+    //LINEインスタンス生成
+    new LINE().sendReplyMessage(messageObject1, this.replyToken);
+
+    //5秒後　
+    Utilities.sleep(500);
+
+    const messageObject2 = [{
+      "type": "text",
+      "text": "こちらは2通目のメッセージです🐎🚜",
+    }
+    ];
 
     //LINEインスタンス生成
-    new LINE().sendReplyMessage(messageObject, this.replyToken);
+    new LINE().sendUniquePushMessage(messageObject2, this.userId);
+
   }
 
 
   /** 出戻りユーザーにファーストメッセージを送信するメソッド */
   greetingToFormerUser_() {
+
+    //スプレッドシートに出力
+    const d = new DataSheet();
+    d.appendRowFollowEvent(this.event);
+
 
     const messageObject = [{
       "type": "text",
@@ -104,13 +119,22 @@ class Follow {
     }
     ];
 
-    //スプレッドシートに出力
-    const d = new DataSheet();
-    d.appendRowFollowEvent(this.event);
-
     //LINEインスタンス生成
     new LINE().sendReplyMessage(messageObject, this.replyToken);
+
+    //5秒後　
+    Utilities.sleep(500);
+
+    const messageObject2 = [{
+      "type": "text",
+      "text": "こちらは2通目のメッセージです🐎🚜",
+    }
+    ];
+
+    //LINEインスタンス生成
+    new LINE().sendUniquePushMessage(messageObject2, this.userId);
   }
+
 
 
   /** ファーストフォームを送信するメソッド */
@@ -127,15 +151,42 @@ class Follow {
     //LINEインスタンス生成
     new LINE().sendUniquePushMessage(messageObject2, this.userId);
 
+    //最初の質問で、自由入力テキストを受け取るためのフラグをスプレッドシートにセットしておく
+    const d = new DataSheet();
+    d.appendRowFollowFormStandby(this.event);
+
+
     //3秒後
     Utilities.sleep(1000);
     const messageObject3 = ENUM_FORM["follow_Form"][0];
     new LINE().sendUniquePushMessage(messageObject3, this.userId);
+    return messageObject3
   }
 
 
 
 }
+
+
+
+/**
+ *  TEST用関数
+ * */
+function testFollow() {
+
+
+  const e = FOLLOW_WebhookEvent_SAMPLE;
+  const event = JSON.parse(e.postData.contents).events[0];
+
+  const f = new Follow(event);
+  console.log(f.name);
+
+  console.log(f.isDomainObject());
+
+  console.log(f.sendFirstForm_());
+
+}
+
 
 /** 🔚 End 🔚 */
 
@@ -186,7 +237,7 @@ class UnFollow {
 /** 🔚 End 🔚 */
 
 /**スポットメッセージドメインオブジェクト */
-class SpotInquiry {
+class SpotMessage {
   /** 
      * @constructor
      * @param{object} Webhookイベントオブジェクト
@@ -197,23 +248,27 @@ class SpotInquiry {
     this.event = event;
 
     //まぁ意味ないかもだけど、ちゃんとEnumから取得しようね
-    this.name = ENUM_DomainObject.SpotInquiry.name;
+    this.name = ENUM_DomainObject.SpotMessage.name;
 
     //こいつら、共通のものはいいけど、独自なものは、自分のメソッド内で呼び出さないとエラーなるよ
     this.mode = event.mode;
     this.timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
     this.replyToken = event.replyToken;
-    this.sourceUserId = event.source.userId;
+    this.userId = event.source.userId; //hasFlag_() で使用
   }
 
   /** ドメインオブジェクトのエントリポイントと言える課題解決メソッド */
   getSolution() {
 
+    //スプレッドシートに出力
+    const d = new DataSheet();
+    d.appendRowSpotMessageEvent(this.event);
+
     //成功処理？
     const ADMIN_EMAIL = PropertiesService.getScriptProperties().getProperty("ADMIN_EMAIL");
     GmailApp.sendEmail(ADMIN_EMAIL, "SpotInquryオブジェクト成功です", this.event.message.text);
 
-    return "SpotInquiryオブジェクトは課題を解決したのでメールを送信しました";
+    return "SpotMessageオブジェクトは課題を解決したのでメールを送信しました";
 
   }
 
@@ -222,13 +277,6 @@ class SpotInquiry {
     return this.event.type === "message" ? true : false
   }
 
-
-  /** Helloを返すメソッド
-   * @return{object} ドメインオブジェクト
-   */
-  getHello() {
-    return "Hello! I'm SpotInquryオブジェクト"
-  }
 
 
 }
@@ -266,16 +314,27 @@ class FollowForm {
 
     try {
 
-      //スプレッドシートに出力
-      const d = new DataSheet();
-      d.appendRowPostBackEvent(this.event);
+      let formZone = "";
 
-      //今何問目？
-      const formZone = this.event.postback.data.match(/Form\d+|終了/)[0]; //Form2など
+      //1通目はテキストメッセージが入ってくる
+      if (this.event.type === "message") {
+        const d = new DataSheet();
+        d.appendRowSpotMessageEvent(this.event);
+        formZone = "Form1";
+      }
+
+      //2通目以降はPostbackだけど
+      if (this.event.type === "postback") {
+        const d = new DataSheet();
+        d.appendRowPostBackEvent(this.event);
+
+        //今何問目？
+        formZone = this.event.postback.data.match(/Form\d+|終了/)[0]; //Form2など
+      }
 
       switch (formZone) {
         case "Form1":
-          //2ndフォーム送信
+          //2rdフォーム送信
           this.sendForm2_();
           break;
         case "Form2":
@@ -286,24 +345,21 @@ class FollowForm {
           //4thフォーム送信
           this.sendForm4_();
           break;
-        case "Form4": //終了
+        case "Form4":
+          //5thフォーム送信
+          this.sendForm5_();
+          break;
+        case "Form5": //終了
           //Endフォーム送信
           this.sendFormEnd_();
           break;
-        case "Form5": //再送
+        case "Form6": //再送
           //フォーム1から送信させる
           this.sendForm1_();
           break;
         default:
         //処理
       }
-
-
-      // //4thフォーム送信
-      // this.sendForm4_();
-
-      // //終了メッセージ送信
-      // this.sendFollowFormEnd_();
 
     } catch (e) {
       GmailApp.sendEmail("kenzo@jugani-japan.com", "FollowFormでerrorです", e.message);
@@ -320,9 +376,30 @@ class FollowForm {
    * @return{boolean} 
    */
   isDomainObject() {
-    //受け取ったPostBackのメッセージに「follow_Form」が含まれていたらtrueを返す
-    const type = this.event.postback.data.match(/follow_Form/)[0];
-    return type === "follow_Form" ? true : false
+
+    //タイプがPostbackで、dataにfollow_Formが入ってたら、それは、FollowFormドメインオブジェクトです。
+    if (this.event.type === "postback") {
+      const type = this.event.postback.data.match(/follow_Form/)[0];
+      return type === "follow_Form" ? true : false;
+    }
+
+    //タイプがmessageで、スプレッドシートのユーザーの直近フィールドがfollowFormStandbyなら、それは、FollowFormドメインオブジェクトです。
+    if (this.event.type === "message") {
+
+      //idでフィルターを掛けて、直近のレコードを確認する
+      const d = new DataSheet();
+      const records = d.getDataSheetRecords();
+      const userFilter = records.filter(record => { return record["userId"] === this.userId });
+
+      //最新行だけ取得
+      const lastRow = userFilter.pop();
+
+      //Type（A列） messageText（B列）
+      const messageType = lastRow["type"];
+      const messageText = lastRow["messageText"];
+      return messageType === "flag" && messageText === "followFormStandby" ? true : false;
+    }
+
   }
 
 
@@ -352,6 +429,14 @@ class FollowForm {
     new LINE().sendUniquePushMessage(messageObject, this.userId);
   }
 
+  /** 5thフォームを送信するメソッド */
+  sendForm5_() {
+    //1秒後
+    Utilities.sleep(1000);
+    const messageObject = ENUM_FORM["follow_Form"][4];
+    new LINE().sendUniquePushMessage(messageObject, this.userId);
+  }
+
   /** 終了フォームを送信するメソッド */
   sendFormEnd_() {
     //1秒後
@@ -369,7 +454,7 @@ https://n-s-coaching.com`,
     new LINE().sendUniquePushMessage(messageObject, this.userId);
   }
 
-    /** 1stフォームを送信するメソッド */
+  /** 1stフォームを送信するメソッド */
   sendForm1_() {
     //1秒後
     Utilities.sleep(1000);
@@ -387,14 +472,55 @@ https://n-s-coaching.com`,
 /**
  *  TEST用関数
  * */
-function myFunction_20230119_022838() {
+function testFollowForm() {
 
-  console.log(ENUM_RICHMENU.testRichMenuSource);
+
+  const e = SpotMessage_WebhookEvent_SAMPLE;
+  const event = JSON.parse(e.postData.contents).events[0];
+
+  const f = new FollowForm(event);
+  console.log(f.name);
+
+  console.log(f.isDomainObject());
 
 }
 
 
 /** 🔚 End 🔚 */
+
+/**キーボード起動などのEmptyPostback用ドメインオブジェクト
+ */
+class EmptyPostback {
+
+  /** 
+    * @constructor
+    * @param{object} Webhookイベントオブジェクト
+    */
+  constructor(event) {
+    //インスタンスで使いながら、コンストラクタでも使うので
+    this.event = event;
+  }
+
+
+  /** ドメインオブジェクトのエントリポイントと言える課題解決メソッド */
+  getSolution() {
+    //成功処理？
+    // const ADMIN_EMAIL = PropertiesService.getScriptProperties().getProperty("ADMIN_EMAIL");
+    // GmailApp.sendEmail(ADMIN_EMAIL, "SpotInquryオブジェクト成功です", this.event.message.text);
+
+    return "EmptyPostbackオブジェクトは課題を解決したのでメールを送信しました";
+  }
+
+
+  /** ドメインオブジェクト判定メソッド
+ * @return{boolean} 
+ */
+  isDomainObject() {
+    //タイプがPostbackで、最後に残ったのはEmptyPostbackドメインオブジェクトです。
+    if (this.event.type === "postback" && this.data === "空のPostbackです") return true
+  }
+
+}
 
 
 

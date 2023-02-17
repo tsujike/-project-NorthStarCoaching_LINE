@@ -46,9 +46,10 @@ class DataSheet {
   }
 
 
+
+
   /** お友だち追加時にレコードを追加するメソッド
    * @param{array} event
-   * @return{boolean} 
    */
   appendRowFollowEvent(event) {
     const messageType = event.type;
@@ -63,7 +64,6 @@ class DataSheet {
 
   /** ブロック時にレコードを追加するメソッド
  * @param{array} event
- * @return{boolean} 
  */
   appendRowUnfollowEvent(event) {
     const messageType = event.type;
@@ -77,7 +77,6 @@ class DataSheet {
 
   /** PostBack時にレコードを追加するメソッド
  * @param{array} event
- * @return{boolean} 
  */
   appendRowPostBackEvent(event) {
     const messageType = event.type;
@@ -90,10 +89,40 @@ class DataSheet {
     const answerNumber = event.postback.data.match(/(?<=\[follow_Form\d_)[A-Z]\d(?=\])/)[0];
     const answerText = event.postback.data.match(/(?<=\])\S+/)[0];
 
-    const record = [messageType, userMessage, timestamp, userId, "", mode, scenario, formZone,answerNumber,answerText];
-
+    const record = [messageType, userMessage, timestamp, userId, "", mode, scenario, formZone, answerNumber, answerText];
     this.sheet.appendRow(record);
   }
+
+
+  /** スポットメッセージ受信時にレコードを追加するメソッド
+ * @param{array} event
+ */
+  appendRowSpotMessageEvent(event) {
+    const messageType = event.type;
+    const userMessage = event.message.text;
+    const timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
+    const userId = event.source.userId;
+    const replyToken = event.replyToken;
+    const mode = event.mode;
+
+    const record = [messageType, userMessage, timestamp, userId, replyToken, mode];
+    this.sheet.appendRow(record);
+  }
+
+  /** （FollowForm用のテキストメッセージ受信待機の）スタンバイフラグをレコードに追加するメソッド
+  * @param{array} event
+  */
+  appendRowFollowFormStandby(event) {
+    const timestamp = Utilities.formatDate(new Date(event.timestamp), "JST", "yyyyMMdd_hh:mm:ss");
+    const userId = event.source.userId;
+    const mode = event.mode;
+
+    const record = ["flag", "followFormStandby", timestamp, userId, "", mode];
+    this.sheet.appendRow(record);
+  }
+
+
+
 
 }
 
@@ -187,7 +216,7 @@ class LINE {
 
   /** 個別ユーザーにPUSHメッセージ
  * @param{string} メッセージオブジェクトのJSON
- * @param{string} ユーザーID
+ * @param{string} ユーザーID　or webhookEventId 
  */
   sendUniquePushMessage(messageObject, userId) {
 
@@ -199,7 +228,7 @@ class LINE {
 
     const payload = {
       'messages': messageObject,
-      'to': userId,
+      'to': userId, //or webhookEventId 
     };
 
     const options = {
@@ -215,6 +244,13 @@ class LINE {
 
 
 
+
+
+
+
+
+
+
 }
 
 
@@ -225,57 +261,133 @@ function testLINE() {
 
   const l = new LINE();
 
-  // const text = "テストです🚀";
+  const text = "みなさん、動作テストありがとうございました。これから改装がはじまるので、メッセージがバンバン来るかもです💦 なので、ブロックしてくださいね。テストです🚀";
 
-  // const messageObject = [{
-  //   'type': 'text',
-  //   'text': text
-  // }];
-  // console.log(l.sendBroadbandMessage(messageObject));
-
-
-  const messageObject = [
-    {
-      "type": "template",
-      "altText": "アンケートに回答ください",
-      "template": {
-        "type": "buttons",
-        "title": "ご職業は？",
-        "text": "以下の中からお選びください",
-        "actions": [
-          {
-            "type": "postback",
-            "label": "会社役員",
-            "data": "会社役員", //.postback.dataで文字列を返す
-            "displayText": "会社役員"
-          },
-          {
-            "type": "postback",
-            "label": "会社員",
-            "data": "会社員", //.postback.dataで文字列を返す
-            "displayText": "会社員"
-          },
-          {
-            "type": "postback",
-            "label": "自営業・フリーランス",
-            "data": "自営業・フリーランス", //.postback.dataで文字列を返す
-            "displayText": "自営業・フリーランス"
-          },
-          {
-            "type": "postback",
-            "label": "その他",
-            "data": "その他", //.postback.dataで文字列を返す
-            "displayText": "その他"
-          }
-        ]
-      }
-    }
-  ];
+  const messageObject = [{
+    'type': 'text',
+    'text': text
+  }];
   console.log(l.sendBroadbandMessage(messageObject));
 
 
-
   // const messageObject = [
+  //   {
+  //     "type": "template",
+  //     "altText": "アンケートに回答ください",
+  //     "template": {
+  //       "type": "buttons",
+  //       "title": "ご職業は？",
+  //       "text": "以下の中からお選びください",
+  //       "actions": [
+  //         {
+  //           "type": "postback",
+  //           "label": "会社役員",
+  //           "data": "会社役員", //.postback.dataで文字列を返す
+  //           "displayText": "会社役員"
+  //         },
+  //         {
+  //           "type": "postback",
+  //           "label": "会社員",
+  //           "data": "会社員", //.postback.dataで文字列を返す
+  //           "displayText": "会社員"
+  //         },
+  //         {
+  //           "type": "postback",
+  //           "label": "自営業・フリーランス",
+  //           "data": "自営業・フリーランス", //.postback.dataで文字列を返す
+  //           "displayText": "自営業・フリーランス"
+  //         },
+  //         {
+  //           "type": "postback",
+  //           "label": "その他",
+  //           "data": "その他", //.postback.dataで文字列を返す
+  //           "displayText": "その他"
+  //         }
+  //       ]
+  //     }
+  //   }
+  // ];
+
+
+
+  // const messageObject = [{
+  //   type: 'flex',
+  //   altText: 'Welcome to our store!',
+  //   contents: {
+  //     "type": "bubble",
+  //     "body": {
+  //       "type": "box",
+  //       "layout": "vertical",
+  //       "contents": [
+  //         {
+  //           "type": "text",
+  //           "text": "Please enter your text",
+  //           "weight": "bold",
+  //           "size": "xl"
+  //         },
+  //         {
+  //           "type": "box",
+  //           "layout": "vertical",
+  //           "contents": [
+  //             {
+  //               "type": "text",
+  //               "text": " ",
+  //               "margin": "lg",
+  //               "size": "sm",
+  //               "color": "#555555",
+  //               "wrap": true
+  //             },
+  //             {
+  //               "type": "text",
+  //               "text": " ",
+  //               "margin": "lg",
+  //               "size": "sm",
+  //               "color": "#555555",
+  //               "wrap": true
+  //             },
+  //             {
+  //               "type": "text",
+  //               "text": " ",
+  //               "margin": "lg",
+  //               "size": "sm",
+  //               "color": "#555555",
+  //               "wrap": true
+  //             },
+  //             {
+  //               "type": "text",
+  //               "text": " ",
+  //               "margin": "lg",
+  //               "size": "sm",
+  //               "color": "#555555",
+  //               "wrap": true
+  //             },
+  //             {
+  //               "type": "text",
+  //               "text": " ",
+  //               "margin": "lg",
+  //               "size": "sm",
+  //               "color": "#555555",
+  //               "wrap": true
+  //             }
+  //           ],
+  //           "borderWidth": "1px",
+  //           "borderColor": "#000000",
+  //           "cornerRadius": "4px",
+  //           "margin": "md",
+  //           "height": "150px",
+  //           "action": {
+  //             "type": "uri",
+  //             "label": "Send",
+  //             "uri": "line://nv/camera/"
+  //           }
+  //         }
+  //       ]
+  //     }
+  //   },
+  // }];
+
+
+  //   const messageObject = [
   //   {
   //     "type": "template",
   //     "altText": "アンケートに回答ください",
@@ -296,7 +408,36 @@ function testLINE() {
   //   }
   // ];
 
-  // const replyToken = "2ca179cb011044718e6c0dfc26b5f780";
+  // console.log(l.sendBroadbandMessage(messageObject));
+  // const userId = "U663d4e7e63fc721cff83604c9a3e65a3";
+  // console.log(l.sendUniquePushMessage(messageObject, userId));
 
-  // console.log(l.sendReplyMessage(messageObject, replyToken));
 }
+
+
+// const messageObject = [
+//   {
+//     "type": "template",
+//     "altText": "アンケートに回答ください",
+//     "template": {
+//       "type": "buttons",
+//       "title": "緊急度はいかがですか？",
+//       "text": "この漢字の読み方は？",
+//       "actions": [ //答えが1つだとしてもこうするのか。なるほど。
+//         {
+//           "type": "postback",
+//           "label": "postback",　//ラベルもいろいろ設定できそうだな・・・・
+//           "data": "これはポストbackでスプシに転送できなかったなWHY?", //.postback.dataで文字列を返す
+//           "displayText": "なにを選択したでしょう。キーボードを開かせましょう",
+//           "inputOption": "openKeyboard",
+//         }
+//       ]
+//     }
+//   }
+// ];
+
+// const replyToken = "2ca179cb011044718e6c0dfc26b5f780";
+
+// console.log(l.sendReplyMessage(messageObject, replyToken));
+
+

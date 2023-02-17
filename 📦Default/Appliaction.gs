@@ -24,8 +24,9 @@ class Application {
     this.domainObjects = {
       Follow: new Follow(this.event),
       UnFollow: new UnFollow(this.event),
-      SpotInquiry: new SpotInquiry(this.event),
-      FollowForm: new FollowForm(this.event)
+      FollowForm: new FollowForm(this.event),
+      SpotMessage: new SpotMessage(this.event),
+      EmptyPostback: new EmptyPostback(this.event)
       //ドメインオブジェクトに変更があったら足す
     }
   }
@@ -52,9 +53,9 @@ class Application {
 
     try {
       const domainObjects = this.domainObjects;
-      for (const domainObjectName in domainObjects) {
-        if (domainObjects[domainObjectName].isDomainObject()) {
-          return domainObjects[domainObjectName]
+      for (const domainObject of Object.values(domainObjects)) {
+        if (domainObject.isDomainObject()) {
+          return domainObject
         }
       }
     } catch (e) {
@@ -94,13 +95,13 @@ function test_Appliaction() {
           const expectation = "UnFollow"
           assertThat(result).is(expectation);
         },
-        'SpotInquiryオブジェクトを返': function () {
-          const e = SpotInquiry_WebhookEvent_SAMPLE;
+        'SpotMessageオブジェクトを返': function () {
+          const e = SpotMessage_WebhookEvent_SAMPLE;
           const event = JSON.parse(e.postData.contents).events[0];
           const a = new Application(event);
-          const domainObject = a.domainObjects["SpotInquiry"];
+          const domainObject = a.domainObjects["SpotMessage"];
           const result = domainObject.name;
-          const expectation = "SpotInquiry"
+          const expectation = "SpotMessage"
           assertThat(result).is(expectation);
         },
       }
