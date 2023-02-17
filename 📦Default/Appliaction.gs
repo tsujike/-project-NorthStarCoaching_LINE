@@ -53,8 +53,11 @@ class Application {
 
     try {
       const domainObjects = this.domainObjects;
+
       for (const domainObject of Object.values(domainObjects)) {
+
         if (domainObject.isDomainObject()) {
+
           return domainObject
         }
       }

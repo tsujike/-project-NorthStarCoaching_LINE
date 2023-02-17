@@ -377,28 +377,30 @@ class FollowForm {
    */
   isDomainObject() {
 
+    //タイプがPostbackで、dataが"空のPostbackです"なら、FollowFormドメインオブジェクトではありません。
+    if (this.event.type === "postback" && this.event.postback.data === "空のPostbackです") return false;
+
     //タイプがPostbackで、dataにfollow_Formが入ってたら、それは、FollowFormドメインオブジェクトです。
-    if (this.event.type === "postback") {
-      const type = this.event.postback.data.match(/follow_Form/)[0];
-      return type === "follow_Form" ? true : false;
-    }
+    if (this.event.type === "postback" && this.event.postback.data.match(/follow_Form/)[0] === "follow_Form") return true;
 
     //タイプがmessageで、スプレッドシートのユーザーの直近フィールドがfollowFormStandbyなら、それは、FollowFormドメインオブジェクトです。
-    if (this.event.type === "message") {
 
-      //idでフィルターを掛けて、直近のレコードを確認する
-      const d = new DataSheet();
-      const records = d.getDataSheetRecords();
-      const userFilter = records.filter(record => { return record["userId"] === this.userId });
+    //idでフィルターを掛けて、直近のレコードを確認する
+    const d = new DataSheet();
+    const records = d.getDataSheetRecords();
+    const userFilter = records.filter(record => { return record["userId"] === this.userId });
 
-      //最新行だけ取得
-      const lastRow = userFilter.pop();
+    //最新行だけ取得
+    const lastRow = userFilter.pop();
 
-      //Type（A列） messageText（B列）
-      const messageType = lastRow["type"];
-      const messageText = lastRow["messageText"];
-      return messageType === "flag" && messageText === "followFormStandby" ? true : false;
-    }
+    //Type（A列） messageText（B列）
+    const messageType = lastRow["type"];
+    const messageText = lastRow["messageText"];
+
+    if (this.event.type === "message" && messageType === "flag" && messageText === "followFormStandby") return true;
+
+    //それ以外はfalseにするの？
+    return false
 
   }
 
@@ -456,6 +458,11 @@ https://n-s-coaching.com`,
 
   /** 1stフォームを送信するメソッド */
   sendForm1_() {
+
+    //最初の質問で、自由入力テキストを受け取るためのフラグをスプレッドシートにセットしておく
+    const d = new DataSheet();
+    d.appendRowFollowFormStandby(this.event);
+
     //1秒後
     Utilities.sleep(1000);
     const messageObject = ENUM_FORM["follow_Form"][0];
@@ -504,11 +511,7 @@ class EmptyPostback {
 
   /** ドメインオブジェクトのエントリポイントと言える課題解決メソッド */
   getSolution() {
-    //成功処理？
-    // const ADMIN_EMAIL = PropertiesService.getScriptProperties().getProperty("ADMIN_EMAIL");
-    // GmailApp.sendEmail(ADMIN_EMAIL, "SpotInquryオブジェクト成功です", this.event.message.text);
-
-    return "EmptyPostbackオブジェクトは課題を解決したのでメールを送信しました";
+    //なにもしない
   }
 
 
@@ -517,12 +520,29 @@ class EmptyPostback {
  */
   isDomainObject() {
     //タイプがPostbackで、最後に残ったのはEmptyPostbackドメインオブジェクトです。
-    if (this.event.type === "postback" && this.data === "空のPostbackです") return true
+    if (this.event.type === "postback" && this.event.postback.data === "空のPostbackです") return true
   }
 
 }
 
 
+
+/**
+ *  TEST用関数
+ * */
+function testEmptyPostback() {
+
+
+  const e = EMPTYPOSTBACK_WebhookEvent_SAMPLE;
+  console.log(e);
+  const event = JSON.parse(e.postData.contents).events[0];
+
+  const empty = new EmptyPostback(event);
+
+
+  console.log(empty.isDomainObject());
+
+}
 
 
 /** 🔚 End 🔚 */
